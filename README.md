@@ -19,12 +19,12 @@ Instructions roughly follow the seqcap_pop pipeline (https://github.com/mgharvey
 - 13_processed-phylip
 
 Here are commands that will do this:
-'''
+```
 cd ~/Desktop/
 mkdir genomics_workshop 
 cd genomics_workshop
 mkdir genomics_workshop 1_raw-reads 2_clean-reads 3_velvet-output 4_match-contigs-to-probes 5_mapping 6_picard 7_merge-bams 8_GATK 9_SNP-tables 10_sequences 11_fasta-parts 12_raw-alignments 13_processed-phylip 
-'''
+```
 
 ### 2. Install PHYLUCE
 https://phyluce.readthedocs.io/en/latest/installation.html

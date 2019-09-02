@@ -1,5 +1,5 @@
 # genomics_workshop
-Materials for UNSA workshop
+Materials for UNSA workshop, roughly following the seqcap_pop pipeline (https://github.com/mgharvey/seqcap_pop)
 
 #### Things to install for Windows users
 - VirtualBox (https://www.virtualbox.org/wiki/Downloads)

@@ -63,12 +63,19 @@ https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software
 
 > [samples]  
 > Xiphorhynchus_obsoletus_AMNH12343:/Users/michaelharvey/Desktop/genomics_workshop/2_clean-reads/Xiphorhynchus_obsoletus_AMNH12343/split-adapter-quality-trimmed
+> Xiphorhynchus_obsoletus_LSUMNS35642:/Users/michaelharvey/Desktop/genomics_workshop/2_clean-reads/Xiphorhynchus_obsoletus_LSUMNS35642/split-adapter-quality-trimmed
 
-#### 12. Run Velvet to de novo assemble our reads into contigs
+#### 12. Run Velvet to "de novo" assemble our reads into contigs for both samples
     phyluce_assembly_assemblo_velvet --conf velvet.conf --output 3_velvet-output --clean --cores 4 --kmer 67
 
-WE NOW HAVE A REFERENCE ASSEMBLY! CHECK IT OUT!
+WE NOW HAVE DE NOVO ASSEMBLIES! Open the contigs.fa files in 3_velvet-output and check them out.
 
-#### 13. Match our de novo contigs to the loci we targeted in our laboratory hybridization and enrichment
-    phyluce_assembly_match_contigs_to_probes 
+#### 13. Match our de novo contigs to the loci we targeted in our laboratory hybridization and enrichment - the scripts we use for this step and the next one are in the Github directory and are modified from Sonal Singhal's excellent SqCL pipeline (https://github.com/singhal/SqCL).
+    python match_contigs_to_probes_mod.py --blat /usr/local/bin/blat --sample Xiphorhynchus_obsoletus_AMNH12343 --dir ~/Desktop/genomics_workshop --evalue 1e-30 --db uce-and-exon-probes.fasta --outdir ./4_match-contigs-to-probes/
+    python match_contigs_to_probes_mod.py --blat /usr/local/bin/blat --sample Xiphorhynchus_obsoletus_LSUMNS35642 --dir ~/Desktop/genomics_workshop --evalue 1e-30 --db uce-and-exon-probes.fasta --outdir ./4_match-contigs-to-probes/
+SqCL matches contigs to our reference loci using blat. We may have to install blat if it's not installed already. Blat executables are available at: http://hgdownload.soe.ucsc.edu/admin/exe/
+
+#### 14. Output a pseudo-reference genome containing the best sequence between our two samples for each locus
+    python make_PRG_mod.py --lineage l1 --file sample_map_for_SqCL.csv --dir ~/Desktop/genomics_workshop --adir ~/Desktop/genomics_workshop/3_velvet-output/contigs --mdir ~/Desktop/genomics_workshop/4_match-contigs-to-probes --keep easy_recip_match
+
 

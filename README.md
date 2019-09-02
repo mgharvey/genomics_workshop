@@ -37,7 +37,7 @@ https://phyluce.readthedocs.io/en/latest/installation.html
 https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software
 
 ### 5.	Convert data files to FASTQ format (one file for each mate pair)
-> /Users/michaelharvey/Applications/sratoolkit.2.9.6-1-mac64/bin/fastq-dump --split-files ~/Downloads/SRR5678249
+        /Users/michaelharvey/Applications/sratoolkit.2.9.6-1-mac64/bin/fastq-dump --split-files ~/Downloads/SRR5678249
 > /Users/michaelharvey/Applications/sratoolkit.2.9.6-1-mac64/bin/fastq-dump --split-files ~/Downloads/SRR5678258
 
 ### 6. Move FASTQ files to the working directory

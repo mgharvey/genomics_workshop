@@ -3,7 +3,7 @@ Materials for UNSA workshop
 
 Instructions roughly follow the seqcap_pop pipeline (https://github.com/mgharvey/seqcap_pop)
 
-1.	Make a directory for this workshop (e.g. "genomics_workshop"), along with a bunch of subfolders within that directory:
+## 1.	Make a directory for this workshop (e.g. "genomics_workshop"), along with a bunch of subfolders within that directory:
 - 1_raw-reads
 - 2_clean-reads
 - 3_velvet-output
@@ -23,14 +23,14 @@ Here are commands that will do this:
 > cd genomics_workshop
 > mkdir genomics_workshop 1_raw-reads 2_clean-reads 3_velvet-output 4_match-contigs-to-probes 5_mapping 6_picard 7_merge-bams 8_GATK 9_SNP-tables 10_sequences 11_fasta-parts 12_raw-alignments 13_processed-phylip 
 
-2. Install PHYLUCE:
+## 2. Install PHYLUCE:
 https://phyluce.readthedocs.io/en/latest/installation.html
 
-3.	Download data files for two samples:
+## 3.	Download data files for two samples:
 - https://trace.ncbi.nlm.nih.gov/Traces/sra/?run=SRR5678249 (LSUMNS_35642)
 - https://trace.ncbi.nlm.nih.gov/Traces/sra/?run=SRR5678258 (AMNH_12343)
 
-4.	Download NCBI SRA toolkit: 
+## 4.	Download NCBI SRA toolkit: 
 https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software
 
 5.	Convert data files to FASTQ format (one file for each mate pair):

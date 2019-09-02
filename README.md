@@ -7,7 +7,8 @@ Materials for UNSA workshop
 You can follows directions for using the vdi with VirtualBox at: https://blogs.oracle.com/oswald/importing-a-vdi-in-virtualbox
 
 Once open, use the password "osboxes.org" to log in. Then find the terminal window in the Virtual Desktop and open that.
-##### Once in the virtual machine install:
+
+Once in the virtual machine install:
 - Phyluce: https://phyluce.readthedocs.io/en/latest/installation.html
 (requires conda)
 

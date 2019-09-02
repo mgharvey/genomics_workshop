@@ -47,10 +47,10 @@ https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software
     gzip *
 
 ### 8. Illumiprocessor requires a very specific naming scheme, so change the names as follows:
-SRR5678249_1.fastq.gz -> SRR5678249_A_L001_R1_001.fastq.gz
-SRR5678249_2.fastq.gz -> SRR5678249_A_L001_R2_002.fastq.gz
-SRR5678258_1.fastq.gz -> SRR5678258_A_L001_R1_001.fastq.gz
-SRR5678258_2.fastq.gz -> SRR5678258_A_L001_R2_002.fastq.gz
+- SRR5678249_1.fastq.gz -> SRR5678249_A_L001_R1_001.fastq.gz
+- SRR5678249_2.fastq.gz -> SRR5678249_A_L001_R2_002.fastq.gz
+- SRR5678258_1.fastq.gz -> SRR5678258_A_L001_R1_001.fastq.gz
+- SRR5678258_2.fastq.gz -> SRR5678258_A_L001_R2_002.fastq.gz
 
 ### 8. Make an Illumiprocessor config file (or see example file "illumiprocessor.conf")
 
@@ -59,8 +59,8 @@ SRR5678258_2.fastq.gz -> SRR5678258_A_L001_R2_002.fastq.gz
 
 ### 10. Make a Velvet config file (simply containing a header, the sample name, and location of cleaned reads)
 
-[samples]
-Xiphorhynchus_obsoletus_AMNH12343:/Users/michaelharvey/Desktop/genomics_workshop/2_clean-reads/Xiphorhynchus_obsoletus_AMNH12343/split-adapter-quality-trimmed
+> [samples]
+> Xiphorhynchus_obsoletus_AMNH12343:/Users/michaelharvey/Desktop/genomics_workshop/2_clean-reads/Xiphorhynchus_obsoletus_AMNH12343/split-adapter-quality-trimmed
 
 ### 11. Run Velvet to de novo assemble our reads into contigs
     phyluce_assembly_assemblo_velvet --conf velvet.conf --output 3_velvet-output --clean --cores 4 --kmer 67

@@ -3,7 +3,8 @@ Materials for UNSA workshop, roughly following the seqcap_pop pipeline (https://
 
 #### Things to install for Windows users
 - VirtualBox (https://www.virtualbox.org/wiki/Downloads)
-- An Ubuntu vdi (e.g., https://sourceforge.net/projects/osboxes/files/v/vb/55-U-u/19.04/19.0464.7z/download)
+- An Ubuntu vdi (e.g., https://sourceforge.net/projects/osboxes/files/v/vb/55-U-u/19.04/19.0464.7z/download).
+
 The vdi may need to be decompressed with Unarchiver (https://theunarchiver.com/). You can follows directions for using the vdi with VirtualBox at: https://blogs.oracle.com/oswald/importing-a-vdi-in-virtualbox
 
 Once open, use the password "osboxes.org" to log in. Then find the terminal window in the Virtual Desktop and open that.

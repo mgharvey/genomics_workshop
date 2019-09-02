@@ -1,6 +1,15 @@
 # genomics_workshop
 Materials for UNSA workshop
 
+#### Things to install for Windows users
+- VirtualBox (https://www.virtualbox.org/wiki/Downloads)
+- An Ubuntu vdi (e.g., https://sourceforge.net/projects/osboxes/files/v/vb/55-U-u/19.04/19.0464.7z/download)
+You can follows directions for using the vdi with VirtualBox at: https://blogs.oracle.com/oswald/importing-a-vdi-in-virtualbox
+Once open, use the password "osboxes.org" to log in. Then find the terminal window in the Virtual Desktop and open that.
+##### Once in the virtual machine install:
+- Phyluce: https://phyluce.readthedocs.io/en/latest/installation.html
+(requires conda)
+
 Instructions roughly follow the seqcap_pop pipeline (https://github.com/mgharvey/seqcap_pop)
 
 #### 1.	Make a directory for this workshop (e.g. "genomics_workshop"), along with a bunch of subfolders within that directory

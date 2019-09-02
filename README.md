@@ -60,6 +60,7 @@ https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software
 ### 10. Make a Velvet config file (simply containing a header, the sample name, and location of cleaned reads)
 
 > [samples]
+>
 > Xiphorhynchus_obsoletus_AMNH12343:/Users/michaelharvey/Desktop/genomics_workshop/2_clean-reads/Xiphorhynchus_obsoletus_AMNH12343/split-adapter-quality-trimmed
 
 ### 11. Run Velvet to de novo assemble our reads into contigs

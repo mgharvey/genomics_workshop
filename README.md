@@ -91,7 +91,7 @@ SqCL matches contigs to our reference loci using blat. We may have to install bl
     python make_PRG_mod.py --lineage l1 --file sample_map_for_SqCL.csv --dir ~/Desktop/genomics_workshop --adir ~/Desktop/genomics_workshop/3_velvet-output/contigs --mdir ~/Desktop/genomics_workshop/4_match-contigs-to-probes --keep easy_recip_match --outdir ~/Desktop/genomics_workshop/4_match-contigs-to-probes
 
 #### 15. Assign a reference sequence for bwa to use
-    bwa index -a is ./4_match-contigs-to-probes/PRG/l1.fasta
+    bwa index -a is ./4_match-contigs-to-probes/l1.fasta
     
 #### 16. Map reads from each individual to the reference using bwa (this makes a pileup)
 
@@ -114,3 +114,26 @@ Individual 2:
 	java -Xmx2g -jar ~/anaconda/jar/FixMateInformation.jar I=./5_mapping/Xiphorhynchus_obsoletus_AMNH12343_pairedreads.bam O=./6_picard/Xiphorhynchus_obsoletus_AMNH12343_pairedreads_FM.bam 
 	java -Xmx2g -jar ~/anaconda/jar/FixMateInformation.jar I=./5_mapping/Xiphorhynchus_obsoletus_LSUMNS35642_pairedreads.bam O=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642_pairedreads_FM.bam 
 	
+#### 19. Sort
+	samtools sort -@ 4 -o ./6_picard/Xiphorhynchus_obsoletus_AMNH12343_pairedreads_ST.bam ./6_picard/Xiphorhynchus_obsoletus_AMNH12343_pairedreads_FM.bam
+	samtools sort -@ 4 -o ./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642_pairedreads_ST.bam ./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642_pairedreads_FM.bam
+
+#### 20. Add read groups to keep track of individuals after combining pileups
+	java -Xmx2g -jar ~/anaconda/jar/AddOrReplaceReadGroups.jar I=./6_picard/Xiphorhynchus_obsoletus_AMNH12343-aln_FM.bam O=./6_picard/Xiphorhynchus_obsoletus_AMNH12343-aln_RG.bam SORT_ORDER=coordinate RGPL=illumina RGPU=TestXX RGLB=Lib1 RGID=Xiphorhynchus_obsoletus_AMNH12343 RGSM=Xiphorhynchus_obsoletus_AMNH12343 VALIDATION_STRINGENCY=LENIENT
+	java -Xmx2g -jar ~/anaconda/jar/AddOrReplaceReadGroups.jar I=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642-aln_FM.bam O=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642-aln_RG.bam SORT_ORDER=coordinate RGPL=illumina RGPU=TestXX RGLB=Lib1 RGID=Xiphorhynchus_obsoletus_LSUMNS35642 RGSM=Xiphorhynchus_obsoletus_LSUMNS35642 VALIDATION_STRINGENCY=LENIENT
+	
+#### 21. Mark PCR duplicates (these do not add info and complicate genotyping)
+	java -Xmx2g -jar ~/anaconda/jar/MarkDuplicates.jar I=./6_picard/Xiphorhynchus_obsoletus_AMNH12343-aln_RG.bam O=./6_picard/Xiphorhynchus_obsoletus_AMNH12343-aln_MD.bam METRICS_FILE=./6_picard/Xiphorhynchus_obsoletus_AMNH12343.metrics MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=250 ASSUME_SORTED=true REMOVE_DUPLICATES=false
+	java -Xmx2g -jar ~/anaconda/jar/MarkDuplicates.jar I=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642-aln_RG.bam O=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642-aln_MD.bam METRICS_FILE=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642.metrics MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=250 ASSUME_SORTED=true REMOVE_DUPLICATES=false
+	
+#### 22. Create a dictionary from the reference contigs
+	java -Xmx2g -jar ~/anaconda/pkgs/picard-1.106-0/jar/CreateSequenceDictionary.jar \
+    R=./4_match-contigs-to-probes/PRG/l1.fasta \
+    O=./4_match-contigs-to-probes/PRG/l1.dict
+
+#### 23. Index the reference
+	samtools faidx ./4_match-contigs-to-probes/PRG/l1.fasta
+
+#### 24. Index the current pileup
+	samtools index ./6_picard/Xiphorhynchus_obsoletus_AMNH12343-aln_MD.bam
+	samtools index ./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642-aln_MD.bam

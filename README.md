@@ -234,7 +234,7 @@ java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisT
 ```
 
 #### 33. Filter SNPs
-cat ./8_GATK/All_SNPs_no_indels.vcf | grep 'PASS\|^#' > ./8_GATK/All_SNPs_pass-only.vcf 
+	cat ./8_GATK/All_SNPs_no_indels.vcf | grep 'PASS\|^#' > ./8_GATK/All_SNPs_pass-only.vcf 
 
 #### Phase SNPs
 ```

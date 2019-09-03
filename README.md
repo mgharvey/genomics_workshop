@@ -120,26 +120,50 @@ samtools view -bS ./5_mapping/Xiphorhynchus_obsoletus_LSUMNS35642-unpairedreads.
 	java -Xmx2g -jar ~/anaconda/jar/FixMateInformation.jar I=./5_mapping/Xiphorhynchus_obsoletus_AMNH12343-pairedreads.bam O=./6_picard/Xiphorhynchus_obsoletus_AMNH12343-pairedreads_FM.bam 
 	java -Xmx2g -jar ~/anaconda/jar/FixMateInformation.jar I=./5_mapping/Xiphorhynchus_obsoletus_LSUMNS35642-pairedreads.bam O=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642-pairedreads_FM.bam 
 	
-#### 19. Sort
-	samtools sort -@ 4 -o ./6_picard/Xiphorhynchus_obsoletus_AMNH12343-pairedreads_ST.bam ./6_picard/Xiphorhynchus_obsoletus_AMNH12343-pairedreads_FM.bam
-	samtools sort -@ 4 -o ./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642-pairedreads_ST.bam ./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642-pairedreads_FM.bam
-
 #### 20. Add read groups to keep track of individuals after combining pileups
-	java -Xmx2g -jar ~/anaconda/jar/AddOrReplaceReadGroups.jar I=./6_picard/Xiphorhynchus_obsoletus_AMNH12343-aln_FM.bam O=./6_picard/Xiphorhynchus_obsoletus_AMNH12343-aln_RG.bam SORT_ORDER=coordinate RGPL=illumina RGPU=TestXX RGLB=Lib1 RGID=Xiphorhynchus_obsoletus_AMNH12343 RGSM=Xiphorhynchus_obsoletus_AMNH12343 VALIDATION_STRINGENCY=LENIENT
-	java -Xmx2g -jar ~/anaconda/jar/AddOrReplaceReadGroups.jar I=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642-aln_FM.bam O=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642-aln_RG.bam SORT_ORDER=coordinate RGPL=illumina RGPU=TestXX RGLB=Lib1 RGID=Xiphorhynchus_obsoletus_LSUMNS35642 RGSM=Xiphorhynchus_obsoletus_LSUMNS35642 VALIDATION_STRINGENCY=LENIENT
+	java -Xmx2g -jar ~/anaconda/jar/AddOrReplaceReadGroups.jar I=./6_picard/Xiphorhynchus_obsoletus_AMNH12343-pairedreads_FM.bam O=./6_picard/Xiphorhynchus_obsoletus_AMNH12343_RG.bam SORT_ORDER=coordinate RGPL=illumina RGPU=TestXX RGLB=Lib1 RGID=Xiphorhynchus_obsoletus_AMNH12343 RGSM=Xiphorhynchus_obsoletus_AMNH12343 VALIDATION_STRINGENCY=LENIENT
+	java -Xmx2g -jar ~/anaconda/jar/AddOrReplaceReadGroups.jar I=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642-pairedreads_FM.bam O=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642_RG.bam SORT_ORDER=coordinate RGPL=illumina RGPU=TestXX RGLB=Lib1 RGID=Xiphorhynchus_obsoletus_LSUMNS35642 RGSM=Xiphorhynchus_obsoletus_LSUMNS35642 VALIDATION_STRINGENCY=LENIENT
 	
 #### 21. Mark PCR duplicates (these do not add info and complicate genotyping)
-	java -Xmx2g -jar ~/anaconda/jar/MarkDuplicates.jar I=./6_picard/Xiphorhynchus_obsoletus_AMNH12343-aln_RG.bam O=./6_picard/Xiphorhynchus_obsoletus_AMNH12343-aln_MD.bam METRICS_FILE=./6_picard/Xiphorhynchus_obsoletus_AMNH12343.metrics MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=250 ASSUME_SORTED=true REMOVE_DUPLICATES=false
-	java -Xmx2g -jar ~/anaconda/jar/MarkDuplicates.jar I=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642-aln_RG.bam O=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642-aln_MD.bam METRICS_FILE=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642.metrics MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=250 ASSUME_SORTED=true REMOVE_DUPLICATES=false
+	java -Xmx2g -jar ~/anaconda/jar/MarkDuplicates.jar I=./6_picard/Xiphorhynchus_obsoletus_AMNH12343_RG.bam O=./6_picard/Xiphorhynchus_obsoletus_AMNH12343_MD.bam METRICS_FILE=./6_picard/Xiphorhynchus_obsoletus_AMNH12343.metrics MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=250 ASSUME_SORTED=true REMOVE_DUPLICATES=false
+	java -Xmx2g -jar ~/anaconda/jar/MarkDuplicates.jar I=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642_RG.bam O=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642_MD.bam METRICS_FILE=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642.metrics MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=250 ASSUME_SORTED=true REMOVE_DUPLICATES=false
 	
 #### 22. Create a dictionary from the reference contigs
 	java -Xmx2g -jar ~/anaconda/pkgs/picard-1.106-0/jar/CreateSequenceDictionary.jar \
-    R=./4_match-contigs-to-probes/PRG/l1.fasta \
-    O=./4_match-contigs-to-probes/PRG/l1.dict
+    R=./4_match-contigs-to-probes/l1.fasta \
+    O=./4_match-contigs-to-probes/l1.dict
 
 #### 23. Index the reference
-	samtools faidx ./4_match-contigs-to-probes/PRG/l1.fasta
+	samtools faidx ./4_match-contigs-to-probes/l1.fasta
 
 #### 24. Index the current pileup
-	samtools index ./6_picard/Xiphorhynchus_obsoletus_AMNH12343-aln_MD.bam
-	samtools index ./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642-aln_MD.bam
+	samtools index ./6_picard/Xiphorhynchus_obsoletus_AMNH12343_MD.bam
+	samtools index ./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642_MD.bam
+	
+#### 25. Merge the BAM pileups
+java -Xmx2g -jar ~/anaconda/jar/MergeSamFiles.jar \
+    SO=coordinate \
+    AS=true \
+    I=./6_picard/Xiphorhynchus_obsoletus_AMNH12343_MD.bam \
+    I=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642_MD.bam \
+    O=./7_merge-bams/All.bam 
+
+#### 26. Index the merged bam file
+	samtools index ./7_merge-bams/All.bam 
+
+#### 27. Call indels
+java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisTK.jar \
+    -T RealignerTargetCreator \
+    -R ./4_match-contigs-to-probes/l1.fasta \
+    -I ./7_merge-bams/All.bam  \
+    --minReadsAtLocus 7 \
+    -o ./8_GATK/All.intervals
+
+#### 28. Realign indels
+java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisTK.jar \
+    -T IndelRealigner \
+    -R ./4_match-contigs-to-probes/l1.fasta \
+    -I ./7_merge-bams/All.bam  \
+    -targetIntervals ./8_GATK/All.intervals \
+    -LOD 3.0 \
+    -o ./8_GATK/All_RI.bam

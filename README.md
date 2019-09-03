@@ -88,6 +88,29 @@ WE NOW HAVE DE NOVO ASSEMBLIES! Open the contigs.fa files in 3_velvet-output and
 SqCL matches contigs to our reference loci using blat. We may have to install blat if it's not installed already. Blat executables are available at: http://hgdownload.soe.ucsc.edu/admin/exe/
 
 #### 14. Output a pseudo-reference genome containing the best sequence between our two samples for each locus
-    python make_PRG_mod.py --lineage l1 --file sample_map_for_SqCL.csv --dir ~/Desktop/genomics_workshop --adir ~/Desktop/genomics_workshop/3_velvet-output/contigs --mdir ~/Desktop/genomics_workshop/4_match-contigs-to-probes --keep easy_recip_match
+    python make_PRG_mod.py --lineage l1 --file sample_map_for_SqCL.csv --dir ~/Desktop/genomics_workshop --adir ~/Desktop/genomics_workshop/3_velvet-output/contigs --mdir ~/Desktop/genomics_workshop/4_match-contigs-to-probes --keep easy_recip_match --outdir ~/Desktop/genomics_workshop/4_match-contigs-to-probes
 
+#### 15. Assign a reference sequence for bwa to use
+    bwa index -a is ./4_match-contigs-to-probes/PRG/l1.fasta
+    
+#### 16. Map reads from each individual to the reference using bwa (this makes a pileup)
 
+Individual 1:
+	bwa mem -t 4 ./4_match-contigs-to-probes/l1.fasta ./2_clean_reads/Xiphorhynchus_obsoletus_AMNH12343/split_adapter_quality_trimmed/Xiphorhynchus_obsoletus_AMNH12343_READ1.fastq.gz ./2_clean_reads/Xiphorhynchus_obsoletus_AMNH12343/split_adapter_quality_trimmed/Xiphorhynchus_obsoletus_AMNH12343_READ2.fastq.gz > ./5_mapping/Xiphorhynchus_obsoletus_AMNH12343_pairedreads.sam
+	bwa mem -t 4 ./4_match-contigs-to-probes/l1.fasta ./2_clean_reads/Xiphorhynchus_obsoletus_AMNH12343/split_adapter_quality_trimmed/Xiphorhynchus_obsoletus_AMNH12343_READ_singleton.fastq.gz > ./5_mapping/Xiphorhynchus_obsoletus_AMNH12343_unpairedreads.sam
+
+Individual 2:
+	bwa mem -t 4 ./4_match-contigs-to-probes/l1.fasta ./2_clean_reads/Xiphorhynchus_obsoletus_LSUMNS35642/split_adapter_quality_trimmed/Xiphorhynchus_obsoletus_LSUMNS35642_READ1.fastq.gz ./2_clean_reads/Xiphorhynchus_obsoletus_LSUMNS35642/split_adapter_quality_trimmed/Xiphorhynchus_obsoletus_LSUMNS35642_READ2.fastq.gz > ./5_mapping/Xiphorhynchus_obsoletus_LSUMNS35642_pairedreads.sam
+	bwa mem -t 4 ./4_match-contigs-to-probes/l1.fasta ./2_clean_reads/Xiphorhynchus_obsoletus_LSUMNS35642/split_adapter_quality_trimmed/Xiphorhynchus_obsoletus_LSUMNS35642_READ_singleton.fastq.gz > ./5_mapping/Xiphorhynchus_obsoletus_LSUMNS35642_unpairedreads.sam
+
+#### 17. Convert the SAM pileup to BAM format
+	samtools view -bS ./5_mapping/Xiphorhynchus_obsoletus_AMNH12343_pairedreads.sam > ./5_mapping/Xiphorhynchus_obsoletus_AMNH12343_pairedreads.bam
+	samtools view -bS ./5_mapping/Xiphorhynchus_obsoletus_AMNH12343_unpairedreads.sam > ./5_mapping/Xiphorhynchus_obsoletus_AMNH12343_unpairedreads.bam
+
+	samtools view -bS ./5_mapping/Xiphorhynchus_obsoletus_LSUMNS35642_pairedreads.sam > ./5_mapping/Xiphorhynchus_obsoletus_LSUMNS35642_pairedreads.bam
+	samtools view -bS ./5_mapping/Xiphorhynchus_obsoletus_LSUMNS35642_unpairedreads.sam > ./5_mapping/Xiphorhynchus_obsoletus_LSUMNS35642_unpairedreads.bam
+
+#### 18. Fix mate pair information
+	java -Xmx2g -jar ~/anaconda/jar/FixMateInformation.jar I=./5_mapping/Xiphorhynchus_obsoletus_AMNH12343_pairedreads.bam O=./6_picard/Xiphorhynchus_obsoletus_AMNH12343_pairedreads_FM.bam 
+	java -Xmx2g -jar ~/anaconda/jar/FixMateInformation.jar I=./5_mapping/Xiphorhynchus_obsoletus_LSUMNS35642_pairedreads.bam O=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642_pairedreads_FM.bam 
+	

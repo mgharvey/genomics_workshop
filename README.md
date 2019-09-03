@@ -129,9 +129,11 @@ samtools view -bS ./5_mapping/Xiphorhynchus_obsoletus_LSUMNS35642-unpairedreads.
 	java -Xmx2g -jar ~/anaconda/jar/MarkDuplicates.jar I=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642_RG.bam O=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642_MD.bam METRICS_FILE=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642.metrics MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=250 ASSUME_SORTED=true REMOVE_DUPLICATES=false
 	
 #### 22. Create a dictionary from the reference contigs
-	java -Xmx2g -jar ~/anaconda/pkgs/picard-1.106-0/jar/CreateSequenceDictionary.jar \
+```
+java -Xmx2g -jar ~/anaconda/pkgs/picard-1.106-0/jar/CreateSequenceDictionary.jar \
     R=./4_match-contigs-to-probes/l1.fasta \
     O=./4_match-contigs-to-probes/l1.dict
+```
 
 #### 23. Index the reference
 	samtools faidx ./4_match-contigs-to-probes/l1.fasta
@@ -141,25 +143,30 @@ samtools view -bS ./5_mapping/Xiphorhynchus_obsoletus_LSUMNS35642-unpairedreads.
 	samtools index ./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642_MD.bam
 	
 #### 25. Merge the BAM pileups
+```
 java -Xmx2g -jar ~/anaconda/jar/MergeSamFiles.jar \
     SO=coordinate \
     AS=true \
     I=./6_picard/Xiphorhynchus_obsoletus_AMNH12343_MD.bam \
     I=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642_MD.bam \
     O=./7_merge-bams/All.bam 
+```
 
 #### 26. Index the merged bam file
 	samtools index ./7_merge-bams/All.bam 
 
 #### 27. Call indels
+```
 java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisTK.jar \
     -T RealignerTargetCreator \
     -R ./4_match-contigs-to-probes/l1.fasta \
     -I ./7_merge-bams/All.bam  \
     --minReadsAtLocus 7 \
     -o ./8_GATK/All.intervals
+```
 
 #### 28. Realign indels
+```
 java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisTK.jar \
     -T IndelRealigner \
     -R ./4_match-contigs-to-probes/l1.fasta \
@@ -167,8 +174,10 @@ java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisT
     -targetIntervals ./8_GATK/All.intervals \
     -LOD 3.0 \
     -o ./8_GATK/All_RI.bam
+```
 
 #### 29. Call SNPs
+```
 java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisTK.jar \
     -T UnifiedGenotyper \
     -R ./4_match-contigs-to-probes/l1.fasta \
@@ -177,8 +186,10 @@ java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisT
     -o ./8_GATK/All_raw_SNPs.vcf \
     -ploidy 2 \
     -rf BadCigar
+```
 
 #### 30. Annotate SNPs
+```
 java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisTK.jar \
     -T VariantAnnotator \
     -R ./4_match-contigs-to-probes/l1.fasta \
@@ -188,8 +199,10 @@ java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisT
     -XA SnpEff \
     -o ./8_GATK/All_raw_SNPs_annotated.vcf \
     -rf BadCigar      
-    
+ ```
+   
 #### 31. Annotate indels
+```
 java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisTK.jar \
     -T UnifiedGenotyper \
     -R ./4_match-contigs-to-probes/l1.fasta \
@@ -198,8 +211,10 @@ java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisT
     -glm INDEL \
     -o ./8_GATK/Genus_species_SNPs_indels.vcf \
     -rf BadCigar         
+```
 
 #### 32. Mask indels
+```
 java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisTK.jar \
     -T VariantFiltration \
     -R ./4_match-contigs-to-probes/l1.fasta \
@@ -216,11 +231,13 @@ java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisT
     --filterName "LowVQCBD" \
     -o ./8_GATK/All_SNPs_no_indels.vcf  \
     -rf BadCigar
+```
 
 #### 33. Filter SNPs
 cat ./8_GATK/All_SNPs_no_indels.vcf | grep 'PASS\|^#' > ./8_GATK/All_SNPs_pass-only.vcf 
 
 #### Phase SNPs
+```
 java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisTK.jar \
     -T ReadBackedPhasing \
     -R ./4_match-contigs-to-probes/l1.fasta \
@@ -230,4 +247,5 @@ java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisT
     -o ./8_GATK/All_SNPs_phased.vcf \
     --phaseQualityThresh 20.0 \
     -rf BadCigar
+```
 

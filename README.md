@@ -236,7 +236,7 @@ java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisT
 #### 33. Filter SNPs
 	cat ./8_GATK/All_SNPs_no_indels.vcf | grep 'PASS\|^#' > ./8_GATK/All_SNPs_pass-only.vcf 
 
-#### Phase SNPs
+#### 34. Phase SNPs
 ```
 java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisTK.jar \
     -T ReadBackedPhasing \
@@ -249,3 +249,4 @@ java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisT
     -rf BadCigar
 ```
 
+WE NOW HAVE A FINAL PHASED, FILTERED VCF FILE OF SNPS ("All_SNPs_phased.vcf")! This serves as the basis (with minor formatting tweaks) for the input into many programs like Structure, adegenet, EEMS, etc.

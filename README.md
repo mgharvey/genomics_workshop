@@ -121,8 +121,8 @@ samtools view -bS ./5_mapping/Xiphorhynchus_obsoletus_LSUMNS35642-unpairedreads.
 	java -Xmx2g -jar ~/anaconda/jar/FixMateInformation.jar I=./5_mapping/Xiphorhynchus_obsoletus_LSUMNS35642-pairedreads.bam O=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642-pairedreads_FM.bam 
 	
 #### 19. Sort
-	samtools sort -@ 4 -o ./6_picard/Xiphorhynchus_obsoletus_AMNH12343_pairedreads_ST.bam ./6_picard/Xiphorhynchus_obsoletus_AMNH12343_pairedreads_FM.bam
-	samtools sort -@ 4 -o ./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642_pairedreads_ST.bam ./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642_pairedreads_FM.bam
+	samtools sort -@ 4 -o ./6_picard/Xiphorhynchus_obsoletus_AMNH12343-pairedreads_ST.bam ./6_picard/Xiphorhynchus_obsoletus_AMNH12343-pairedreads_FM.bam
+	samtools sort -@ 4 -o ./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642-pairedreads_ST.bam ./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642-pairedreads_FM.bam
 
 #### 20. Add read groups to keep track of individuals after combining pileups
 	java -Xmx2g -jar ~/anaconda/jar/AddOrReplaceReadGroups.jar I=./6_picard/Xiphorhynchus_obsoletus_AMNH12343-aln_FM.bam O=./6_picard/Xiphorhynchus_obsoletus_AMNH12343-aln_RG.bam SORT_ORDER=coordinate RGPL=illumina RGPU=TestXX RGLB=Lib1 RGID=Xiphorhynchus_obsoletus_AMNH12343 RGSM=Xiphorhynchus_obsoletus_AMNH12343 VALIDATION_STRINGENCY=LENIENT

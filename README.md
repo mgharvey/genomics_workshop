@@ -168,7 +168,7 @@ java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisT
     -LOD 3.0 \
     -o ./8_GATK/All_RI.bam
 
-#### Call SNPs
+#### 29. Call SNPs
 java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisTK.jar \
     -T UnifiedGenotyper \
     -R ./4_match-contigs-to-probes/l1.fasta \
@@ -178,8 +178,7 @@ java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisT
     -ploidy 2 \
     -rf BadCigar
 
-#### Annotate SNPs
-
+#### 30. Annotate SNPs
 java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisTK.jar \
     -T VariantAnnotator \
     -R ./4_match-contigs-to-probes/l1.fasta \
@@ -189,22 +188,18 @@ java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisT
     -XA SnpEff \
     -o ./8_GATK/All_raw_SNPs_annotated.vcf \
     -rf BadCigar      
-
-#### Annotate indels
-
+    
+#### 31. Annotate indels
 java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisTK.jar \
     -T UnifiedGenotyper \
-    -R /Volumes/G-DRIVE/seabirds/bioinformatics/PRG/l1.fasta \
-    -I /Volumes/G-DRIVE/seabirds/bioinformatics/8_GATK/All_RI.bam \
+    -R ./4_match-contigs-to-probes/l1.fasta \
+    -I ./8_GATK/All_RI.bam \
     -gt_mode DISCOVERY \
     -glm INDEL \
-    -o /Volumes/G-DRIVE/seabirds/bioinformatics/8_GATK/Genus_species_SNPs_indels.vcf \
+    -o ./8_GATK/Genus_species_SNPs_indels.vcf \
     -rf BadCigar         
 
-
-
-
-#### 29. Mask indels
+#### 32. Mask indels
 java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisTK.jar \
     -T VariantFiltration \
     -R ./4_match-contigs-to-probes/l1.fasta \
@@ -219,6 +214,20 @@ java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisT
     --filterName "LowQual" \
     --filterExpression "QD < 5.0" \
     --filterName "LowVQCBD" \
-    -o /Volumes/G-DRIVE/seabirds/bioinformatics/8_GATK/All_SNPs_no_indels.vcf  \
+    -o ./8_GATK/All_SNPs_no_indels.vcf  \
+    -rf BadCigar
+
+#### 33. Filter SNPs
+cat ./8_GATK/All_SNPs_no_indels.vcf | grep 'PASS\|^#' > ./8_GATK/All_SNPs_pass-only.vcf 
+
+#### Phase SNPs
+java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisTK.jar \
+    -T ReadBackedPhasing \
+    -R ./4_match-contigs-to-probes/l1.fasta \
+    -I ./8_GATK/All_RI.bam \
+    --variant ./8_GATK/All_SNPs_pass-only.vcf \
+    -L ./8_GATK/All_SNPs_pass-only.vcf \
+    -o ./8_GATK/All_SNPs_phased.vcf \
+    --phaseQualityThresh 20.0 \
     -rf BadCigar
 

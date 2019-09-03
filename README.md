@@ -167,3 +167,58 @@ java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisT
     -targetIntervals ./8_GATK/All.intervals \
     -LOD 3.0 \
     -o ./8_GATK/All_RI.bam
+
+#### Call SNPs
+java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisTK.jar \
+    -T UnifiedGenotyper \
+    -R ./4_match-contigs-to-probes/l1.fasta \
+    -I ./8_GATK/All_RI.bam \
+    -gt_mode DISCOVERY \
+    -o ./8_GATK/All_raw_SNPs.vcf \
+    -ploidy 2 \
+    -rf BadCigar
+
+#### Annotate SNPs
+
+java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisTK.jar \
+    -T VariantAnnotator \
+    -R ./4_match-contigs-to-probes/l1.fasta \
+    -I ./8_GATK/All_RI.bam \
+    -G StandardAnnotation \
+    -V:variant,VCF ./8_GATK/All_raw_SNPs.vcf \
+    -XA SnpEff \
+    -o ./8_GATK/All_raw_SNPs_annotated.vcf \
+    -rf BadCigar      
+
+#### Annotate indels
+
+java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisTK.jar \
+    -T UnifiedGenotyper \
+    -R /Volumes/G-DRIVE/seabirds/bioinformatics/PRG/l1.fasta \
+    -I /Volumes/G-DRIVE/seabirds/bioinformatics/8_GATK/All_RI.bam \
+    -gt_mode DISCOVERY \
+    -glm INDEL \
+    -o /Volumes/G-DRIVE/seabirds/bioinformatics/8_GATK/Genus_species_SNPs_indels.vcf \
+    -rf BadCigar         
+
+
+
+
+#### 29. Mask indels
+java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisTK.jar \
+    -T VariantFiltration \
+    -R ./4_match-contigs-to-probes/l1.fasta \
+    -V ./8_GATK/All_raw_SNPs.vcf \
+    --mask ./8_GATK/Genus_species_SNPs_indels.vcf \
+    --maskExtension 5 \
+    --maskName InDel \
+    --clusterWindowSize 10 \
+    --filterExpression "MQ0 >= 4 && ((MQ0 / (1.0 * DP)) > 0.1)" \
+    --filterName "BadValidation" \
+    --filterExpression "QUAL < 30.0" \
+    --filterName "LowQual" \
+    --filterExpression "QD < 5.0" \
+    --filterName "LowVQCBD" \
+    -o /Volumes/G-DRIVE/seabirds/bioinformatics/8_GATK/All_SNPs_no_indels.vcf  \
+    -rf BadCigar
+

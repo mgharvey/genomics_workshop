@@ -251,7 +251,7 @@ java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisT
 
 WE NOW HAVE A FINAL PHASED, FILTERED VCF FILE OF SNPS ("All_SNPs_phased.vcf")! This serves as the basis (with minor formatting tweaks) for the input into many programs like Structure, adegenet, EEMS, etc (see some examples in the "Converters" folder). This is where most folks will stop. However, to analyze whole sequences from each locus (for e.g. phylogenetics/phylogeography) we may want to produce multi-sequence alignments. That process is described below.
 
-There are various options for producing sequences for multi-sequence alignment. One way is to use the contigs from Velvet, the pseudo-reference genome. This represents a haplotype for each locus for each species (even though we know many species are diploid or polyploid). A good pipeline for doing this is available at the Phyluce site: https://phyluce.readthedocs.io/en/latest/tutorial-one.html.
+There are various options for producing sequences for multi-sequence alignment. One way is to use the contigs from Velvet, the pseudo-reference genome. Each contig sequence represents a haplotype for a locus (even though we know many species are diploid or polyploid). A good pipeline for doing this is available at the Phyluce site: https://phyluce.readthedocs.io/en/latest/tutorial-one.html. Another options is to use the GATK variant calls to assemble diploid sequences ("diplotypes") for each individual so we can make multi-species alignments with both sequences at each locus. I plan to implement a strategy for doing this using just the GATK output, which will use the function "EMIT_ALL_SITES" from GATK to obtain both variant and invariant bases in order to construct sequences. In the meantime, we can use a shortcut method, inserting the variable sites back into the consensus sequences from Velvet. Although this provides us with two sequences per locus per individual, it erroneously represents the completeness of the data set (individuals missing data from a locus will have that data added in according to the consensus sequence from the pseudo-reference genome). This is not optimal, but it illustrates the multi-sequence alignment part of the pipeline.
 
 #### 32. Make VCFs for each individual
 
@@ -275,7 +275,6 @@ java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisT
     -sn Xiphorhynchus_obsoletus_LSUMNS35642 \
     -rf BadCigar
 ```
-
     
 #### 32. For each individual, make SNP tables (the current input format for SNP data for multi-sequence alignment steps)
 

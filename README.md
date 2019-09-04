@@ -92,9 +92,20 @@ SqCL matches contigs to our reference loci using blat. You may have to download 
     python make_PRG_mod.py --lineage l1 --file sample_map_for_SqCL.csv --dir ~/Desktop/genomics_workshop --adir ~/Desktop/genomics_workshop/3_velvet-output/contigs --mdir ~/Desktop/genomics_workshop/4_match-contigs-to-probes --keep easy_recip_match --outdir ~/Desktop/genomics_workshop/4_match-contigs-to-probes
 If all we cared about was the consensus sequence for each individual, we could stop here! Since we want to call all variants and genotype each individual, we need to keep going!
 
-#### 15. Assign a reference sequence for bwa to use
+#### 15. Now do some things to prepare the sequences for later mapping/variant-calling
+Create a dictionary from the reference contigs
+```
+java -Xmx2g -jar ~/anaconda/pkgs/picard-1.106-0/jar/CreateSequenceDictionary.jar \
+    R=./4_match-contigs-to-probes/l1.fasta \
+    O=./4_match-contigs-to-probes/l1.dict
+```
+
+Index the reference 
+	samtools faidx ./4_match-contigs-to-probes/l1.fasta
+
+Assign the PRG as an index for bwa:
     bwa index -a is ./4_match-contigs-to-probes/l1.fasta
-    
+
 #### 16. Map reads from each individual to the reference using bwa (this makes a pileup)
 
 Individual 1:
@@ -122,29 +133,15 @@ samtools view -bS ./5_mapping/Xiphorhynchus_obsoletus_LSUMNS35642-unpairedreads.
 	java -Xmx2g -jar ~/anaconda/jar/FixMateInformation.jar I=./5_mapping/Xiphorhynchus_obsoletus_AMNH12343-pairedreads.bam O=./6_picard/Xiphorhynchus_obsoletus_AMNH12343-pairedreads_FM.bam 
 	java -Xmx2g -jar ~/anaconda/jar/FixMateInformation.jar I=./5_mapping/Xiphorhynchus_obsoletus_LSUMNS35642-pairedreads.bam O=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642-pairedreads_FM.bam 
 	
-#### 20. Add read groups to keep track of individuals after combining pileups
+#### 19. Add read groups to keep track of individuals after combining pileups
 	java -Xmx2g -jar ~/anaconda/jar/AddOrReplaceReadGroups.jar I=./6_picard/Xiphorhynchus_obsoletus_AMNH12343-pairedreads_FM.bam O=./6_picard/Xiphorhynchus_obsoletus_AMNH12343_RG.bam SORT_ORDER=coordinate RGPL=illumina RGPU=TestXX RGLB=Lib1 RGID=Xiphorhynchus_obsoletus_AMNH12343 RGSM=Xiphorhynchus_obsoletus_AMNH12343 VALIDATION_STRINGENCY=LENIENT
 	java -Xmx2g -jar ~/anaconda/jar/AddOrReplaceReadGroups.jar I=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642-pairedreads_FM.bam O=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642_RG.bam SORT_ORDER=coordinate RGPL=illumina RGPU=TestXX RGLB=Lib1 RGID=Xiphorhynchus_obsoletus_LSUMNS35642 RGSM=Xiphorhynchus_obsoletus_LSUMNS35642 VALIDATION_STRINGENCY=LENIENT
 	
-#### 21. Mark PCR duplicates (these do not add info and complicate genotyping)
+#### 20. Mark PCR duplicates (these do not add info and complicate genotyping)
 	java -Xmx2g -jar ~/anaconda/jar/MarkDuplicates.jar I=./6_picard/Xiphorhynchus_obsoletus_AMNH12343_RG.bam O=./6_picard/Xiphorhynchus_obsoletus_AMNH12343_MD.bam METRICS_FILE=./6_picard/Xiphorhynchus_obsoletus_AMNH12343.metrics MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=250 ASSUME_SORTED=true REMOVE_DUPLICATES=false
 	java -Xmx2g -jar ~/anaconda/jar/MarkDuplicates.jar I=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642_RG.bam O=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642_MD.bam METRICS_FILE=./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642.metrics MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=250 ASSUME_SORTED=true REMOVE_DUPLICATES=false
 	
-#### 22. Create a dictionary from the reference contigs
-```
-java -Xmx2g -jar ~/anaconda/pkgs/picard-1.106-0/jar/CreateSequenceDictionary.jar \
-    R=./4_match-contigs-to-probes/l1.fasta \
-    O=./4_match-contigs-to-probes/l1.dict
-```
-
-#### 23. Index the reference
-	samtools faidx ./4_match-contigs-to-probes/l1.fasta
-
-#### 24. Index the current pileup
-	samtools index ./6_picard/Xiphorhynchus_obsoletus_AMNH12343_MD.bam
-	samtools index ./6_picard/Xiphorhynchus_obsoletus_LSUMNS35642_MD.bam
-	
-#### 25. Merge the BAM pileups
+#### 21. Merge the BAM pileups
 ```
 java -Xmx2g -jar ~/anaconda/jar/MergeSamFiles.jar \
     SO=coordinate \
@@ -154,10 +151,10 @@ java -Xmx2g -jar ~/anaconda/jar/MergeSamFiles.jar \
     O=./7_merge-bams/All.bam 
 ```
 
-#### 26. Index the merged bam file
+#### 22. Index the merged bam file
 	samtools index ./7_merge-bams/All.bam 
 
-#### 27. Call indels
+#### 23. Call indels
 ```
 java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisTK.jar \
     -T RealignerTargetCreator \
@@ -167,7 +164,7 @@ java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisT
     -o ./8_GATK/All.intervals
 ```
 
-#### 28. Realign indels
+#### 24. Realign pileups around indels
 ```
 java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisTK.jar \
     -T IndelRealigner \
@@ -178,7 +175,7 @@ java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisT
     -o ./8_GATK/All_RI.bam
 ```
 
-#### 29. Call SNPs
+#### 25. Call SNPs
 ```
 java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisTK.jar \
     -T UnifiedGenotyper \
@@ -190,7 +187,7 @@ java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisT
     -rf BadCigar
 ```
 
-#### 30. Annotate SNPs
+#### 26. Annotate SNPs
 ```
 java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisTK.jar \
     -T VariantAnnotator \
@@ -203,7 +200,7 @@ java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisT
     -rf BadCigar      
  ```
    
-#### 31. Annotate indels
+#### 27. Annotate indels
 ```
 java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisTK.jar \
     -T UnifiedGenotyper \
@@ -215,7 +212,7 @@ java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisT
     -rf BadCigar         
 ```
 
-#### 32. Mask indels
+#### 28. Mask indels
 ```
 java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisTK.jar \
     -T VariantFiltration \
@@ -235,10 +232,10 @@ java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisT
     -rf BadCigar
 ```
 
-#### 33. Filter SNPs
+#### 29. Filter SNPs
 	cat ./8_GATK/All_SNPs_no_indels.vcf | grep 'PASS\|^#' > ./8_GATK/All_SNPs_pass-only.vcf 
 
-#### 34. Phase SNPs
+#### 30. Phase SNPs
 ```
 java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisTK.jar \
     -T ReadBackedPhasing \
@@ -251,4 +248,5 @@ java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisT
     -rf BadCigar
 ```
 
-WE NOW HAVE A FINAL PHASED, FILTERED VCF FILE OF SNPS ("All_SNPs_phased.vcf")! This serves as the basis (with minor formatting tweaks) for the input into many programs like Structure, adegenet, EEMS, etc.
+WE NOW HAVE A FINAL PHASED, FILTERED VCF FILE OF SNPS ("All_SNPs_phased.vcf")! This serves as the basis (with minor formatting tweaks) for the input into many programs like Structure, adegenet, EEMS, etc. This is where most folks will stop. However, to analyze whole sequences from each locus (for e.g. phylogenetics/phylogeography) we may want to produce multi-sequence alignments. That process is described below (but needs updating).
+

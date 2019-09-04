@@ -186,6 +186,7 @@ java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisT
     -ploidy 2 \
     -rf BadCigar
 ```
+Note that you may want to output ALL (including invariant) sites for some analyses. Do this by adding "-output_mode EMIT_ALL_SITES".
 
 #### 26. Annotate SNPs
 ```
@@ -248,5 +249,49 @@ java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisT
     -rf BadCigar
 ```
 
-WE NOW HAVE A FINAL PHASED, FILTERED VCF FILE OF SNPS ("All_SNPs_phased.vcf")! This serves as the basis (with minor formatting tweaks) for the input into many programs like Structure, adegenet, EEMS, etc (see some examples in the "Converters" folder). This is where most folks will stop. However, to analyze whole sequences from each locus (for e.g. phylogenetics/phylogeography) we may want to produce multi-sequence alignments. That process is described below (but needs updating).
+WE NOW HAVE A FINAL PHASED, FILTERED VCF FILE OF SNPS ("All_SNPs_phased.vcf")! This serves as the basis (with minor formatting tweaks) for the input into many programs like Structure, adegenet, EEMS, etc (see some examples in the "Converters" folder). This is where most folks will stop. However, to analyze whole sequences from each locus (for e.g. phylogenetics/phylogeography) we may want to produce multi-sequence alignments. That process is described below.
+
+There are various options for producing sequences for multi-sequence alignment. One way is to use the contigs from Velvet for each individual. These represent haplotypes, or a single sequence from each locus for each species. If we want the diploid sequences, we need to build sequences that include the variant information from GATK. We will try this below. The current version inserts variants from GATK into consensus sequences from Velvet, but this needs to be adjusted to leverage the EMIT_ALL_SITES option in GATK for outputting variant and invariant sites. This update will more accurately represent missing data. 
+
+#### 31. Output the Velvet contigs that mapped to target loci for each individual using the SqCL mapping information
+```
+python output_sample_fastas.py \
+	./3_velvet-output/Xiphorhynchus_obsoletus_AMNH12343/contigs.fasta \
+	./4_match-contigs-to-probes/Xiphorhynchus_obsoletus_AMNH12343_matches.csv \
+	./4_match-contigs-to-probes/fastas/Xiphorhynchus_obsoletus_AMNH12343.fasta \
+	1
+```
+
+#### 32. Add phased SNPs to reference and optionally filter (seqcap_pop script)
+```
+python add_phased_snps_to_seqs_filter.py \
+	./4_match-contigs-to-probes/fastas/Xiphorhynchus_obsoletus_AMNH12343.fasta \
+	./9_SNP-tables/Xiphorhynchus_obsoletus_AMNH12343_SNPs_phased-table.txt \
+	./10_sequences/Xiphorhynchus_obsoletus_AMNH12343/Xiphorhynchus_obsoletus_AMNH12343_sequences.txt \
+	1
+```
+
+#### 33. Collate sequences from all individuals into files by UCE (seqcap_pop script)
+```
+python collate_sample_fastas.py \
+	./10_sequences/Xiphorhynchus_obsoletus_AMNH12343/ \
+	./11_fasta-parts/Xiphorhynchus_obsoletus_AMNH12343/ \
+	sequences.txt
+```
+
+#### 34. Do a final alignment to make sure these sequences line up (MAFFT)
+```
+python run_mafft.py \
+	./11_fasta-parts/Xiphorhynchus_obsoletus_AMNH12343/ \
+	./12_raw-alignments/Xiphorhynchus_obsoletus_AMNH12343/
+```
+
+#### 35. Convert MAFFT output to Phylip alignments
+```
+python process_mafft_alignments.py \
+	./12_raw-alignments/Xiphorhynchus_obsoletus_AMNH12343 \
+	./13_processed-phylip/Xiphorhynchus_obsoletus_AMNH12343
+```
+
+DONE! These alignments can now be used as input for phyogenetic programs to build gene trees. Those gene trees can be used as input for e.g. Astral, *BEAST, and other gene tree-species tree methods.
 

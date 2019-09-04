@@ -248,5 +248,5 @@ java -Xmx2g -jar ~/anaconda/pkgs/GenomeAnalysisTK-3.3-0-g37228af/GenomeAnalysisT
     -rf BadCigar
 ```
 
-WE NOW HAVE A FINAL PHASED, FILTERED VCF FILE OF SNPS ("All_SNPs_phased.vcf")! This serves as the basis (with minor formatting tweaks) for the input into many programs like Structure, adegenet, EEMS, etc. This is where most folks will stop. However, to analyze whole sequences from each locus (for e.g. phylogenetics/phylogeography) we may want to produce multi-sequence alignments. That process is described below (but needs updating).
+WE NOW HAVE A FINAL PHASED, FILTERED VCF FILE OF SNPS ("All_SNPs_phased.vcf")! This serves as the basis (with minor formatting tweaks) for the input into many programs like Structure, adegenet, EEMS, etc (see some examples in the "Converters" folder). This is where most folks will stop. However, to analyze whole sequences from each locus (for e.g. phylogenetics/phylogeography) we may want to produce multi-sequence alignments. That process is described below (but needs updating).
 

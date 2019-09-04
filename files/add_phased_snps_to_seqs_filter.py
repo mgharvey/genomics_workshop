@@ -29,7 +29,7 @@ def get_args():
 	parser.add_argument(
 			"phase_file",
 			type=str,
-			help="""The input file of phase data"""
+			help="""The input vcf file of phased variants"""
 		)
 	parser.add_argument(
 			"out_file",

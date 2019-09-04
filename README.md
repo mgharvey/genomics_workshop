@@ -3,7 +3,7 @@ Materials for UNSA workshop, roughly following the seqcap_pop pipeline (https://
 
 #### Things to install for Windows users
 - VirtualBox (https://www.virtualbox.org/wiki/Downloads)
-- An Ubuntu vdi (e.g., https://sourceforge.net/projects/osboxes/files/v/vb/55-U-u/19.04/19.0464.7z/download).
+- A Linux-based OS vdi (e.g., the Ubuntu vdi at https://sourceforge.net/projects/osboxes/files/v/vb/55-U-u/19.04/19.0464.7z/download).
 
 The vdi may need to be decompressed with Unarchiver (https://theunarchiver.com/). You can follow directions for using the vdi with VirtualBox at: https://blogs.oracle.com/oswald/importing-a-vdi-in-virtualbox
 
@@ -11,9 +11,9 @@ Once open, use the password "osboxes.org" to log in. Then find the terminal wind
 
 Once in the virtual machine install:
 - Phyluce: https://phyluce.readthedocs.io/en/latest/installation.html
-(requires conda)
+(instructions at the link above, note that it requires conda)
 
-Instructions roughly follow the seqcap_pop pipeline (https://github.com/mgharvey/seqcap_pop)
+The following instructions roughly follow the seqcap_pop pipeline (https://github.com/mgharvey/seqcap_pop).
 
 #### 1.	Make a directory for this workshop (e.g. "genomics_workshop"), along with a bunch of subfolders within that directory
 - 1_raw-reads
@@ -65,6 +65,7 @@ https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software
 - SRR5678249_2.fastq.gz -> SRR5678249_A_L001_R2_002.fastq.gz
 - SRR5678258_1.fastq.gz -> SRR5678258_A_L001_R1_001.fastq.gz
 - SRR5678258_2.fastq.gz -> SRR5678258_A_L001_R2_002.fastq.gz
+Most of the name don't matter (only the first and last parts that are separated by underscores "_").
 
 #### 9. Make an Illumiprocessor config file (or see example file "illumiprocessor.conf")
 
@@ -80,15 +81,16 @@ https://trace.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=software
 #### 12. Run Velvet to "de novo" assemble our reads into contigs for both samples
     phyluce_assembly_assemblo_velvet --conf velvet.conf --output 3_velvet-output --clean --cores 4 --kmer 67
 
-WE NOW HAVE DE NOVO ASSEMBLIES! Open the contigs.fa files in 3_velvet-output and check them out.
+WE NOW HAVE DE NOVO ASSEMBLIES! Open the contigs.fa files in 3_velvet-output and check them out. 
 
 #### 13. Match our de novo contigs to the loci we targeted in our laboratory hybridization and enrichment - the scripts we use for this step and the next one are in the Github directory and are modified from Sonal Singhal's excellent SqCL pipeline (https://github.com/singhal/SqCL).
     python match_contigs_to_probes_mod.py --blat /usr/local/bin/blat --sample Xiphorhynchus_obsoletus_AMNH12343 --dir ~/Desktop/genomics_workshop --evalue 1e-30 --db uce-and-exon-probes.fasta --outdir ./4_match-contigs-to-probes/
     python match_contigs_to_probes_mod.py --blat /usr/local/bin/blat --sample Xiphorhynchus_obsoletus_LSUMNS35642 --dir ~/Desktop/genomics_workshop --evalue 1e-30 --db uce-and-exon-probes.fasta --outdir ./4_match-contigs-to-probes/
-SqCL matches contigs to our reference loci using blat. We may have to install blat if it's not installed already. Blat executables are available at: http://hgdownload.soe.ucsc.edu/admin/exe/
+SqCL matches contigs to our reference loci using blat. You may have to download blat if you don't already have it. Blat executables are available at: http://hgdownload.soe.ucsc.edu/admin/exe/. Then you must specify the location of the blat executable after the --blat flag as I did above.
 
 #### 14. Output a pseudo-reference genome containing the best sequence between our two samples for each locus
     python make_PRG_mod.py --lineage l1 --file sample_map_for_SqCL.csv --dir ~/Desktop/genomics_workshop --adir ~/Desktop/genomics_workshop/3_velvet-output/contigs --mdir ~/Desktop/genomics_workshop/4_match-contigs-to-probes --keep easy_recip_match --outdir ~/Desktop/genomics_workshop/4_match-contigs-to-probes
+If all we cared about was the consensus sequence for each individual, we could stop here! Since we want to call all variants and genotype each individual, we need to keep going!
 
 #### 15. Assign a reference sequence for bwa to use
     bwa index -a is ./4_match-contigs-to-probes/l1.fasta

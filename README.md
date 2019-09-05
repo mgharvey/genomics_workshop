@@ -336,7 +336,7 @@ python run_mafft.py \
 
 #### 36. Convert MAFFT output to Phylip alignments
 ```
-python process_mafft_alignments.py \
+python process_mafft_alignments_GATK.py \
 	./12_raw-alignments/ \
 	./13_processed-phylip/
 ```
